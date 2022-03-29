@@ -1,9 +1,21 @@
+/**
+ * Table of authorized keys.  Each key must be EXACTLY 8 characters and the value must be the exact hostname to match the request.
+ */
 const KEYS = {
   '<8-char-value>' : 'example.com',
   '<8-char-value>' : 'sub.example.com',
   '<8-char-value>' : 'other.example.com'
 }
 
+/**
+ * Extract the key from the first 8 chacters of the password, compare it and the allowed hostname from the KEYS table matches the requesting hostname,
+ * and if successful, return the cloudflare token portion of the password.
+ *
+ * @param {URL} url
+ * @param {String} password
+ * @throws {UnauthorizedException}
+ * @returns {String} cloudflare token
+ */
 function processPassword(url, password){
   const hostname = url.searchParams.get("hostname");
   const key = password.substring(0,8);
