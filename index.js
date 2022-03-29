@@ -1,3 +1,23 @@
+const KEYS = {
+  '<8-char-value>' : 'example.com',
+  '<8-char-value>' : 'sub.example.com',
+  '<8-char-value>' : 'other.example.com'
+}
+
+function processPassword(url, password){
+  const hostname = url.searchParams.get("hostname");
+  const key = password.substring(0,8);
+
+  const allowedHostname = KEYS[key];
+  if ( allowedHostname != hostname ){
+    throw UnauthorizedException("unauthorized for hostname");
+  }
+
+  const token = password.substring(8);
+  return token;
+}
+
+
 /**
  * Receives a HTTP request and replies with a response.
  * @param {Request} request
@@ -23,8 +43,10 @@
         const url = new URL(request.url);
         verifyParameters(url);
 
+        const token = processPassword(url, password);
+
         // Only returns this response when no exception is thrown.
-        const response = await informAPI(url, username, password);
+        const response = await informAPI(url, username, token);
         return response;
       }
 
@@ -210,9 +232,10 @@ addEventListener("fetch", (event) => {
   event.respondWith(
     handleRequest(event.request).catch((err) => {
       const message = err.reason || err.stack || "Unknown Error";
-
+        
+        // status: err.status || 500,
       return new Response(message, {
-        status: err.status || 500,
+        status: 500,
         statusText: err.statusText || null,
         headers: {
           "Content-Type": "text/plain;charset=UTF-8",
