@@ -13,6 +13,7 @@ I have a UniFi Dream Machine Pro (UDM-Pro), and I want to update my Cloudflare d
 3. Copy and paste the contents of [index.js](https://github.com/willswire/unifi-cloudflare-ddns/blob/main/index.js) into the code editor for your worker. Ensure that you are replacing any boilerplate/code that is currently there. 
 4. Once you have created the worker, take note of it's \*.workers.dev route. More on routes for Cloudflare Workers [here](https://developers.cloudflare.com/workers/platform/routes#routes-with-workersdev).
 5. Create an API token so the Worker can update your DNS records. Go to https://dash.cloudflare.com/profile/api-tokens and select "Create custom token". Enable permissions for both **Zone:Read** and **DNS:Edit**. Copy your API Key - you will need it later when configuring your UniFi OS Controller.
+6. Update the 'KEYS' map at the top of the worker javascript code.  Each key must be exactly 8 characters, and the value should be the allowed hostname value for that key.  You will prepend the 8-character key to the password (token) in the configuration below.
 
 ## Configuring UniFi OS
 
@@ -22,7 +23,7 @@ I have a UniFi Dream Machine Pro (UDM-Pro), and I want to update my Cloudflare d
 - `Service`: choose dyndns
 - `Hostname`: the full subdomain and hostname of the record you want to update (e.g. `subdomain.mydomain.com`, `mydomain.com` for root domain)
 - `Username`: the domain name containing the record (e.g. `mydomain.com`)
-- `Password`: the Cloudflare API Token you created earlier
+- `Password`: Concatenate the appropriate KEY and the Cloudflare API Token you created earlier.  e.g., <KEY><HOSTNAME>.  The Key must be exactly 8 characters.
 - `Server`: the Cloudflare Worker route ~`<worker-name>.<worker-subdomain>.workers.dev`~ 
   - as of Unifi Network 7.0.25 this needs to be `<worker-name>.<worker-subdomain>.workers.dev/nic/update?hostname=%h&myip=%i`. 
 
